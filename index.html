@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>List</title>
+	<link rel="stylesheet" href="style.css" type="text/stylesheets">
+	<style>
+		#select{
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+	input{
+		padding: 5px;
+		margin-bottom: 15px;
+	}
+		</style>
+</head>
+<body>
+
+<h1>List with random colorize</h1>
+<input type="text" id="list-input" onfocus="this.focused = true" onblur="this.focused = false" placeholder="Your item">
+<button id="btn-add">Add item</button>
+<button id="btn-del">Delete item</button>
+<button id="btn-clear">Clear list</button>
+<button id="btn-sort">Sort list</button>
+<button id="btn-backup">Backup List</button>
+<button id="colorList">Colorize this list!</button>
+
+<div>You selected: </div>
+<div id="select">Item</div>
+<div>List:</div>
+<ul id="cars-list">
+	<li>Zeux</li>
+	<li>Reno</li>
+	<li>Almeria</li>
+	<li>Fiat</li>
+	<li>Passat</li>
+	<li>Kia</li>
+	<li>BMW</li>
+</ul>
+<script>
+	var 
+		list = document.getElementById('cars-list'),
+		li,
+		input = document.getElementById('list-input'),
+		output = document.getElementById('select'),
+		add = document.getElementById('btn-add'),
+		del = document.getElementById('btn-del'),
+		clear = document.getElementById('btn-clear'),
+		sort = document.getElementById('btn-sort'),
+		back = document.getElementById('btn-backup'),
+		colorList = document.getElementById('colorList'),
+		backup,
+		parent;
+
+		add.addEventListener('click',addItem);
+		clear.addEventListener('click',clearList);
+		sort.addEventListener('click',sortList);
+		back.addEventListener('click', backupList);
+		document.addEventListener('keydown', addItemFromKeyBoard);
+		colorList.addEventListener('click',setColor);
+		list.addEventListener('click',memorizeLi);
+		del.addEventListener('click',deleteItem);
+
+	function addItem(e){
+		if(input.focused){
+			input.focused = false;
+		}
+		if(input.value){
+			var li = document.createElement('li');
+			li.innerHTML = input.value;
+			list.appendChild(li);
+		}
+	}
+
+	function deleteItem(e){
+		if(!li) alert("Nothing to delete.");
+		list.removeChild(li);
+		output.innerHTML = 'You deleted: ' + li.innerHTML;
+	}
+
+	function memorizeLi(e){
+		if(e.target.nodeName != 'LI') return;
+		li = e.target;
+		output.innerHTML = e.target.innerText;
+	}
+
+	function addItemFromKeyBoard(e){
+		
+		if(e.keyCode == 13 && input.value && input.focused){
+			var li = document.createElement('li');
+			li.innerHTML = input.value;
+			list.appendChild(li);
+		} else return;
+	}
+
+    function clearList(){
+    	backup = list.cloneNode(true);
+    	parent = list.parentNode;
+    	parent.removeChild(list);
+    }
+
+    function backupList(){
+    	if(!backup) return;
+    	list = backup;
+    	parent.appendChild(backup);
+    }
+
+    
+    var secondSelect;
+
+	function sortList(){
+
+    	var arrLis = list.children;
+		var arr = [];
+
+    	for(var i = 0; i < arrLis.length; i++){
+    		arr.push(arrLis[i].innerText);
+    	}
+
+    	if(!secondSelect){
+    		secondSelect = true;
+    		arr.sort(function(a, b){    		
+    			return a.toLowerCase() > b.toLowerCase()? 1: -1;
+    		})
+    		
+    	} else {
+    		secondSelect = false;
+    		arr.sort(function(a, b){    		
+    			return b.toLowerCase() > a.toLowerCase()? 1: -1;
+    		})
+    	};
+
+    	list.innerHTML = '';
+    	for(var i = 0; i < arr.length; i++){
+    		var li = document.createElement('li');
+    		li.innerHTML = arr[i];
+    		list.appendChild(li);
+    	}
+
+    }
+
+    function randomColor(){
+    	//aC is array color
+    	var aC = [0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'],
+    	max = aC.length,
+    	color,
+    	colorArr = [];
+    	
+    	for(var i = 6; i--;){
+    		var pos = Math.round(Math.random() * 16);
+    		colorArr[i] = aC[pos];
+    	}/*
+    	colorArr.unshift('#');*/
+        color = colorArr.reduce(function(res,el){
+        	return res + el;
+        },'');
+        return '#' + color;
+
+    }
+
+    function setColor(){
+    	var children = list.children;
+    	var max = children.length;
+    	for(;max--;){
+    		if(children[max].nodeType != 1) continue;
+    		var color = randomColor();
+    		children[max].style.backgroundColor = color;
+    	}
+    }
+</script>	
+</body>
+</html>
